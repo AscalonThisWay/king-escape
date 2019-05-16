@@ -16,28 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-document.addEventListener('deviceready', function() {
-    var config = {
-        type: Phaser.WEBGL,
-        parent: 'game',
-        width: window.innerWidth * window.devicePixelRatio,
-        height: window.innerHeight * window.devicePixelRatio,
-        scene: {
-            preload: preload,
-            create: create
-        }
-    };
-    
-    var game = new Phaser.Game(config);
-    
-    function preload() {
-    }
-    
-    function create() {
-        var g2 = this.add.grid(300, 340, 512, 256, 64, 64, 0x00b9f2).setAltFillStyle(0x016fce).setOutlineStyle();
-    }    
-});
 
-if (!window.cordova) {
-    window.dispatchEvent('deviceready');
+var config = {
+    type: Phaser.WEBGL,
+    parent: 'game',
+    width: window.innerWidth * window.devicePixelRatio,
+    height: window.innerHeight * window.devicePixelRatio,
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
+
+var game = new Phaser.Game(config);
+var sx = 0;
+
+function preload() {
+}
+
+function create() {
+    var g1 = this.add.grid(160, 256, 320, 512, 64, 64, 0x000).setAltFillStyle(0xffffff).setOutlineStyle();
+    var g2 = this.add.grid(160, 768, 320, 512, 64, 64, 0x000).setAltFillStyle(0xffffff).setOutlineStyle();
+}    
+
+function update (time, delta) 
+{
+    sx -= 2;
+    if (sx === -512)
+    {
+        this.g2.
+        sx = 0;
+    }
+    this.cameras.main.scrollY = sx;
 }
