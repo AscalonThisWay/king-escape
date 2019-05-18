@@ -20,8 +20,10 @@
 var config = {
     type: Phaser.WEBGL,
     parent: 'game',
-    width: window.innerWidth * window.devicePixelRatio,
-    height: window.innerHeight * window.devicePixelRatio,
+    // width: window.innerWidth * window.devicePixelRatio,
+    // height: window.innerHeight * window.devicePixelRatio,
+    width: 400,
+    height: 512,
     scene: {
         preload: preload,
         create: create,
@@ -30,23 +32,70 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
-var sx = 0;
+var map;
+var sy = 0;
+var mapWidth = 5;
+var mapHeight = 9;
 
 function preload() {
+    this.load.image('tiles', '../img/tileset.png');
 }
 
 function create() {
-    var g1 = this.add.grid(160, 256, 320, 512, 64, 64, 0x000).setAltFillStyle(0xffffff).setOutlineStyle();
-    var g2 = this.add.grid(160, 768, 320, 512, 64, 64, 0x000).setAltFillStyle(0xffffff).setOutlineStyle();
+    //var g1 = this.add.grid(160, 256, 320, 512, 64, 64, 0x000).setAltFillStyle(0xffffff).setOutlineStyle();
+    //var g2 = this.add.grid(160, 768, 320, 512, 64, 64, 0x000).setAltFillStyle(0xffffff).setOutlineStyle();
+    var mapData = [];
+
+    for (var y = 0; y < mapHeight; y++)
+    {
+        var row = [];
+
+        for (var x = 0; x < mapWidth; x++)
+        {
+            var tileIndex = (x + y) % 2;
+
+            row.push(tileIndex);
+        }
+
+        mapData.push(row);
+    }
+
+    map = this.make.tilemap({ data: mapData, tileWidth: 64, tileHeight: 64 });
+
+    var tileset = map.addTilesetImage('tiles');
+    var layer = map.createDynamicLayer(0, tileset, (400-(mapWidth*64))/2, -64);
 }    
 
 function update (time, delta) 
 {
-    sx -= 2;
-    if (sx === -512)
+    //  Any speed as long as 64 evenly divides by it
+    sy -= 0.5;
+
+    if (sy === -64)
     {
-        this.g2.
-        sx = 0;
+        //  Reset and create new strip
+
+        var tile;
+        var prev;
+
+        for (var x = 0; x < mapWidth; x++)
+        {
+            for (var y = mapHeight - 1; y >= 0; y--)
+            {
+                tile = map.getTileAt(x, y);
+                if (y === 0)
+                {
+                    prev = map.getTileAt(x, y + 1);
+                    tile.index = prev.index === 0 ? 1 : 0;
+                } else {
+                    prev = map.getTileAt(x, y - 1);
+                    tile.index = prev.index;
+                }
+            }
+        }
+
+        sy = 0;
     }
-    this.cameras.main.scrollY = sx;
+
+    this.cameras.main.scrollY = sy;
 }
