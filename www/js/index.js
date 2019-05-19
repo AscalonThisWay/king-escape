@@ -36,14 +36,16 @@ var map;
 var sy = 0;
 var mapWidth = 5;
 var mapHeight = 9;
+var boardLayer;
+var piecesLayer;
+var king;
 
 function preload() {
     this.load.image('tiles', '../img/tileset.png');
+    this.load.image('king', '../img/king.png');
 }
 
 function create() {
-    //var g1 = this.add.grid(160, 256, 320, 512, 64, 64, 0x000).setAltFillStyle(0xffffff).setOutlineStyle();
-    //var g2 = this.add.grid(160, 768, 320, 512, 64, 64, 0x000).setAltFillStyle(0xffffff).setOutlineStyle();
     var mapData = [];
 
     for (var y = 0; y < mapHeight; y++)
@@ -63,7 +65,10 @@ function create() {
     map = this.make.tilemap({ data: mapData, tileWidth: 64, tileHeight: 64 });
 
     var tileset = map.addTilesetImage('tiles');
-    var layer = map.createDynamicLayer(0, tileset, (400-(mapWidth*64))/2, -64);
+
+    boardLayer = map.createDynamicLayer(0, tileset, (400-(mapWidth*64))/2, -64);
+    let startingKingTile = map.getTileAt(2, 5, false, boardLayer);
+    king = this.add.sprite(startingKingTile.getCenterX(), startingKingTile.getCenterY(), 'king');
 }    
 
 function update (time, delta) 
@@ -74,7 +79,7 @@ function update (time, delta)
     if (sy === -64)
     {
         //  Reset and create new strip
-
+        king.y += 64;
         var tile;
         var prev;
 
@@ -82,13 +87,13 @@ function update (time, delta)
         {
             for (var y = mapHeight - 1; y >= 0; y--)
             {
-                tile = map.getTileAt(x, y);
+                tile = map.getTileAt(x, y, false, boardLayer);
                 if (y === 0)
                 {
-                    prev = map.getTileAt(x, y + 1);
+                    prev = map.getTileAt(x, y + 1, false, boardLayer);
                     tile.index = prev.index === 0 ? 1 : 0;
                 } else {
-                    prev = map.getTileAt(x, y - 1);
+                    prev = map.getTileAt(x, y - 1, false, boardLayer);
                     tile.index = prev.index;
                 }
             }
